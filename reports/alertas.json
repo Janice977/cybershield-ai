@@ -1,0 +1,155 @@
+{
+  "project": "CyberShield AI",
+  "version": "1.0.0",
+  "data_origin": "Somente dados fornecidos pelo operador",
+  "alerts": [
+    {
+      "id": "CSAI-002-004-20261117110300",
+      "rule_id": "CSAI-002",
+      "title": "Possível pulverização de senhas",
+      "severity": "high",
+      "entity": "198.51.100.5",
+      "timestamp": "2026-11-17T11:03:00+00:00",
+      "evidence_count": 4,
+      "evidence": [
+        {
+          "timestamp": "2026-11-17T11:00:00+00:00",
+          "username": "ana"
+        },
+        {
+          "timestamp": "2026-11-17T11:01:00+00:00",
+          "username": "bruno"
+        },
+        {
+          "timestamp": "2026-11-17T11:02:00+00:00",
+          "username": "carla"
+        },
+        {
+          "timestamp": "2026-11-17T11:03:00+00:00",
+          "username": "daniel"
+        }
+      ],
+      "mitre_attack": "T1110.003",
+      "recommendation": "Confirmar contas-alvo, limites de autenticação e MFA.",
+      "confidence": "heurística: requer validação humana",
+      "triage": {
+        "summary": "Possível pulverização de senhas associado a 198.51.100.5.",
+        "assessment": "4 evidência(s); severidade high. Indício, não confirmação.",
+        "next_steps": [
+          "Preservar logs originais e registrar horários (UTC).",
+          "Confirmar contas-alvo, limites de autenticação e MFA.",
+          "Correlacionar com outras fontes antes de classificar como incidente confirmado.",
+          "Escalar ao responsável e documentar decisões."
+        ],
+        "privacy_check": "Verificar se dados pessoais foram afetados; não presumir vazamento ou obrigação automática de comunicar à ANPD.",
+        "status": "triagem pendente de revisão humana"
+      }
+    },
+    {
+      "id": "CSAI-003-001-20261117120000",
+      "rule_id": "CSAI-003",
+      "title": "Alteração suspeita de parâmetro OT",
+      "severity": "high",
+      "entity": "camara-fria-demo",
+      "timestamp": "2026-11-17T12:00:00+00:00",
+      "evidence_count": 1,
+      "evidence": [
+        {
+          "asset": "camara-fria-demo",
+          "value": "-2"
+        }
+      ],
+      "mitre_attack": "T0836",
+      "recommendation": "Acionar responsável OT; conferir manutenção autorizada e telemetria; NÃO alterar remotamente o equipamento.",
+      "confidence": "heurística: requer validação humana",
+      "triage": {
+        "summary": "Alteração suspeita de parâmetro OT associado a camara-fria-demo.",
+        "assessment": "1 evidência(s); severidade high. Indício, não confirmação.",
+        "next_steps": [
+          "Preservar logs originais e registrar horários (UTC).",
+          "Acionar responsável OT; conferir manutenção autorizada e telemetria; NÃO alterar remotamente o equipamento.",
+          "Correlacionar com outras fontes antes de classificar como incidente confirmado.",
+          "Escalar ao responsável e documentar decisões."
+        ],
+        "privacy_check": "Verificar se dados pessoais foram afetados; não presumir vazamento ou obrigação automática de comunicar à ANPD.",
+        "status": "triagem pendente de revisão humana"
+      }
+    },
+    {
+      "id": "CSAI-004-001-20261117120100",
+      "rule_id": "CSAI-004",
+      "title": "Evento de malware informado",
+      "severity": "high",
+      "entity": "estacao-demo",
+      "timestamp": "2026-11-17T12:01:00+00:00",
+      "evidence_count": 1,
+      "evidence": [
+        {
+          "asset": "estacao-demo"
+        }
+      ],
+      "mitre_attack": "T1204",
+      "recommendation": "Isolar somente com autorização, preservar evidências e abrir investigação.",
+      "confidence": "heurística: requer validação humana",
+      "triage": {
+        "summary": "Evento de malware informado associado a estacao-demo.",
+        "assessment": "1 evidência(s); severidade high. Indício, não confirmação.",
+        "next_steps": [
+          "Preservar logs originais e registrar horários (UTC).",
+          "Isolar somente com autorização, preservar evidências e abrir investigação.",
+          "Correlacionar com outras fontes antes de classificar como incidente confirmado.",
+          "Escalar ao responsável e documentar decisões."
+        ],
+        "privacy_check": "Verificar se dados pessoais foram afetados; não presumir vazamento ou obrigação automática de comunicar à ANPD.",
+        "status": "triagem pendente de revisão humana"
+      }
+    },
+    {
+      "id": "CSAI-001-005-20261117100400",
+      "rule_id": "CSAI-001",
+      "title": "Possível força bruta",
+      "severity": "medium",
+      "entity": "192.0.2.10",
+      "timestamp": "2026-11-17T10:04:00+00:00",
+      "evidence_count": 5,
+      "evidence": [
+        {
+          "timestamp": "2026-11-17T10:00:00+00:00",
+          "username": "admin"
+        },
+        {
+          "timestamp": "2026-11-17T10:01:00+00:00",
+          "username": "admin"
+        },
+        {
+          "timestamp": "2026-11-17T10:02:00+00:00",
+          "username": "admin"
+        },
+        {
+          "timestamp": "2026-11-17T10:03:00+00:00",
+          "username": "admin"
+        },
+        {
+          "timestamp": "2026-11-17T10:04:00+00:00",
+          "username": "admin"
+        }
+      ],
+      "mitre_attack": "T1110",
+      "recommendation": "Validar tentativas com a equipe, revisar autenticação e MFA.",
+      "confidence": "heurística: requer validação humana",
+      "triage": {
+        "summary": "Possível força bruta associado a 192.0.2.10.",
+        "assessment": "5 evidência(s); severidade medium. Indício, não confirmação.",
+        "next_steps": [
+          "Preservar logs originais e registrar horários (UTC).",
+          "Validar tentativas com a equipe, revisar autenticação e MFA.",
+          "Correlacionar com outras fontes antes de classificar como incidente confirmado.",
+          "Escalar ao responsável e documentar decisões."
+        ],
+        "privacy_check": "Verificar se dados pessoais foram afetados; não presumir vazamento ou obrigação automática de comunicar à ANPD.",
+        "status": "triagem pendente de revisão humana"
+      }
+    }
+  ],
+  "caution": "Ferramenta de apoio, não valida ataque nem substitui equipe SOC/DPO."
+}

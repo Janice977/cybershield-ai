@@ -1,0 +1,9 @@
+timestamp,event_type,src_ip,username
+2026-11-17T14:00:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:01:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:02:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:03:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:04:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:05:00Z,login_failed,192.0.2.10,conta_teste
+2026-11-17T14:01:00Z,login_success,198.51.100.20,usuario_demo
+2026-11-17T14:02:00Z,login_failed,203.0.113.3,usuario_demo

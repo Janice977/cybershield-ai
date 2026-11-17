@@ -1,0 +1,13 @@
+timestamp,event_type,src_ip,username,asset,value,authorized
+2026-11-17T10:00:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T10:01:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T10:02:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T10:03:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T10:04:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T10:05:00Z,login_failed,192.0.2.10,admin,,,
+2026-11-17T11:00:00Z,login_failed,198.51.100.5,ana,,,
+2026-11-17T11:01:00Z,login_failed,198.51.100.5,bruno,,,
+2026-11-17T11:02:00Z,login_failed,198.51.100.5,carla,,,
+2026-11-17T11:03:00Z,login_failed,198.51.100.5,daniel,,,
+2026-11-17T12:00:00Z,ot_setpoint_change,,,camara-fria-demo,-2,false
+2026-11-17T12:01:00Z,malware_detected,,,estacao-demo,,
