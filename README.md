@@ -1,28 +1,56 @@
-# CyberShield AI v3.0 — Comunidade 🛡️
 
-Protótipo **defensivo e open source** (MIT), para análise de logs autorizados. Inclui painel Streamlit e notebook interativo Google Colab.
+# 🛡️ CyberShield AI v3.2 — Community
 
-## Google Colab (mais simples)
-Baixe e abra `CyberShield_AI_v3_Colab.ipynb` em [Google Colab](https://colab.research.google.com/), execute todas as células. O notebook é independente e usa dados sintéticos; exibe gráficos, controles de limiar e exportação JSON.
+**Open Source Cybersecurity & AI-Powered Defensive Monitoring**
 
-## Streamlit (computador ou hospedagem privada)
-```bash
-python -m pip install -r requirements.txt
-python -m pytest -q
-streamlit run app.py
-```
-O Colab gratuito **não hospeda um site Streamlit público por padrão**. Por segurança, não incluímos túnel público. Use o notebook interativo no Colab e o Streamlit em ambiente local/privado.
+O CyberShield AI é um projeto open source desenvolvido em Python para apoiar a detecção de eventos suspeitos, a triagem de alertas e o aprendizado colaborativo em cibersegurança.
 
-## Contribua
-Leia `CONTRIBUTING.md`, `SECURITY.md` e `docs/ROADMAP.md`. Abrir issues, enviar pull requests, acrescentar testes e criar novas regras são formas de colaborar.
+## 🚀 Demonstração online
 
-## Limitações
-* Quatro regras heurísticas para demonstração; nenhuma detecção equivale a ataque comprovado.
-* A camada de *machine learning* v2.2 é experimento separado; não está integrada à interface v3.
-* Não envia dados a APIs; não executa bloqueios nem acessa sistemas OT reais.
-* Utilize somente dados autorizados. Não publique registros contendo informações pessoais, tokens ou segredos.
+**Acesse o aplicativo:**
 
+https://cybershield-ai-community.streamlit.app/
 
-## Notebook v3.1 (Google Colab)
+## 🔐 Funcionalidades
 
-Abra `CyberShield_AI_v3_1_Colab.ipynb` no Colab e execute todas as células. O notebook combina painel de regras com **avaliação separada** do Isolation Forest em dados sintéticos; não afirma que os alertas do painel foram classificados pelo modelo. Saídas: `cybershield_relatorio_v31.json` e `cybershield_avaliacao_v22.json`.
+- Detecção de possíveis ataques de força bruta e pulverização de senhas.
+- Identificação de eventos suspeitos em ambientes OT simulados.
+- Análise de eventos de malware informados nos registros.
+- Pontuação experimental de anomalias com Isolation Forest.
+- Painel interativo desenvolvido em Streamlit.
+- Geração de relatórios JSON.
+- Orientações defensivas para investigação SOC N1.
+
+## 🤖 Inteligência Artificial
+
+A versão 3.2 integra um modelo experimental de aprendizado de máquina aos alertas produzidos pelo motor de regras.
+
+O modelo utiliza dados sintéticos e suas pontuações não representam probabilidades de ataque.
+
+A ferramenta não realiza bloqueios automáticos nem substitui a análise de profissionais de Segurança da Informação.
+
+## 💻 Google Colab
+
+O repositório disponibiliza notebooks para demonstrações e experimentos educacionais.
+
+Os notebooks das versões anteriores permanecem disponíveis para consulta e reprodução dos experimentos.
+
+## 🤝 Contribua com o projeto
+
+Convidamos estudantes, pesquisadores, desenvolvedores e profissionais de cibersegurança a contribuir com novas funcionalidades, testes, documentação e melhorias.
+
+Consulte:
+
+- `CONTRIBUTING.md`
+- `SECURITY.md`
+- `docs/ROADMAP.md`
+
+Utilize as abas **Issues**, **Pull Requests** e **Discussions** do GitHub para participar.
+
+## ⚠️ Segurança e limitações
+
+Este projeto é experimental e educacional. Não foi validado para proteção de ambientes de produção.
+
+Utilize exclusivamente dados fictícios ou devidamente autorizados. Não envie dados pessoais, credenciais ou informações confidenciais ao aplicativo público.
+
+**CyberShield AI — Tecnologia aberta, inteligência coletiva e cibersegurança para todos.**
