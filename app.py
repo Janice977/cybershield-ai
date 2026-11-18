@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from src.engine import read_events, detect, triage, export_report
+from src.anomaly import score_alerts
 st.set_page_config(page_title="CyberShield AI v3",page_icon="🛡️",layout="wide")
 st.title("🛡️ CyberShield AI | Centro de triagem")
 st.caption("Projeto colaborativo • regras explicáveis • dados locais • revisão humana")
@@ -51,3 +52,20 @@ st.download_button("⬇️ Baixar relatório JSON",json.dumps(export_report(aler
 st.subheader("Dados carregados (até 100 linhas)")
 if events: st.dataframe(pd.DataFrame([{**e,'timestamp':e['timestamp'].isoformat()} for e in events[:100]]),use_container_width=True)
 st.caption("Não usa API externa nem modelo generativo. Modelo estatístico v2.2 deve ser avaliado separadamente; métricas sintéticas não são métricas deste painel.")
+
+# Pontuação experimental: separada das regras e sem ações automatizadas.
+st.subheader("IA experimental aplicada aos alertas")
+st.caption("Modelo treinado em dados sintéticos de demonstração. A pontuação não representa probabilidade de ataque, nem reproduz a avaliação independente v2.2.")
+if alerts:
+    scores = score_alerts(alerts)
+    st.dataframe(pd.DataFrame([{
+        "Regra": x["rule_id"], "Entidade": x["entity"],
+        "Pontuação de anomalia": x["anomaly_score"],
+        "Anomalia (demo)": x["demo_anomaly"],
+    } for x in scores]), use_container_width=True)
+    st.download_button("⬇️ Baixar relatório com IA experimental", json.dumps({
+        "rules": export_report(alerts), "ai_experimental": scores,
+        "disclaimer": "IA experimental sobre alertas, treinamento sintético e validação humana obrigatória"
+    }, ensure_ascii=False, indent=2), file_name="cybershield_v32_relatorio.json", mime="application/json")
+else:
+    st.info("Sem alertas das regras para pontuar nesta demonstração.")
