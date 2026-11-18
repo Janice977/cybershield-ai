@@ -1,5 +1,5 @@
 
-# 🛡️ CyberShield AI v3.2 — Community
+# 🛡️ CyberShield AI v3.2.2 — Community
 
 **Open Source Cybersecurity & AI-Powered Defensive Monitoring**
 
@@ -23,7 +23,7 @@ https://cybershield-ai-community.streamlit.app/
 
 ## 🤖 Inteligência Artificial
 
-A versão 3.2 integra um modelo experimental de aprendizado de máquina aos alertas produzidos pelo motor de regras.
+A versão 3.2.2 integra um modelo experimental de aprendizado de máquina aos alertas produzidos pelo motor de regras.
 
 O modelo utiliza dados sintéticos e suas pontuações não representam probabilidades de ataque.
 
@@ -54,3 +54,10 @@ Este projeto é experimental e educacional. Não foi validado para proteção de
 Utilize exclusivamente dados fictícios ou devidamente autorizados. Não envie dados pessoais, credenciais ou informações confidenciais ao aplicativo público.
 
 **CyberShield AI — Tecnologia aberta, inteligência coletiva e cibersegurança para todos.**
+
+
+## Controles de upload
+
+A demonstração pública desabilita uploads por padrão. Para habilitar em **instalação privada controlada**, o operador precisa definir **todas** as variáveis: `CYBERSHIELD_DEPLOYMENT_MODE=private`, `CYBERSHIELD_ENABLE_UPLOADS=1` e `CYBERSHIELD_PUBLIC_DEMO=0`. Não habilite uploads no Streamlit Community Cloud. Essa configuração não substitui autenticação, isolamento, proteção de dados ou avaliação de segurança.
+
+A automação `.github/workflows/dependency-audit.yml` executa `pip-audit` semanalmente, sob demanda e em alterações de dependências. Alertas devem ser triados; intervalos de versões não garantem reprodução bit a bit.
