@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 import csv, json, ipaddress
 from pathlib import Path
+from src.version import VERSION
 
 RULES = {
  "CSAI-001": ("Possível força bruta", "T1110", "Validar tentativas com a equipe, revisar autenticação e MFA."),
@@ -81,5 +82,5 @@ def triage(a):
      "status":"triagem pendente de revisão humana"}
 
 def export_report(alerts):
-    return {"project":"CyberShield AI","version":"1.0.0","data_origin":"Somente dados fornecidos pelo operador",
+    return {"project":"CyberShield AI","version":VERSION,"data_origin":"Somente dados fornecidos pelo operador",
       "alerts": [{**a,"triage":triage(a)} for a in alerts],"caution":"Ferramenta de apoio, não valida ataque nem substitui equipe SOC/DPO."}

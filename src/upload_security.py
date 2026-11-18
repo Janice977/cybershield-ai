@@ -6,8 +6,12 @@ MAX_UPLOAD_BYTES = 5_000_000
 SAFE_UPLOAD_ERROR = "Não foi possível ler o arquivo. Verifique o formato CSV/JSON e utilize apenas dados autorizados."
 
 def uploads_enabled() -> bool:
-    """Explicit opt-in ONLY for private/local deployment, not for a public demo."""
-    return os.environ.get("CYBERSHIELD_ENABLE_UPLOADS", "").strip() == "1"
+    """Require private deployment mode plus opt-in; public demos stay disabled by default."""
+    return (
+        os.environ.get("CYBERSHIELD_DEPLOYMENT_MODE", "").strip().lower() == "private"
+        and os.environ.get("CYBERSHIELD_ENABLE_UPLOADS", "").strip() == "1"
+        and os.environ.get("CYBERSHIELD_PUBLIC_DEMO", "1").strip() == "0"
+    )
 
 def validate_upload(filename: str, size: int) -> str:
     """Validate metadata; callers must still parse file content defensively."""

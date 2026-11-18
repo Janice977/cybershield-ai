@@ -5,9 +5,10 @@ import pandas as pd
 import streamlit as st
 from src.engine import read_events, detect, triage, export_report
 from src.anomaly import score_alerts
+from src.version import VERSION
 from src.upload_security import uploads_enabled, validate_upload, SAFE_UPLOAD_ERROR
-st.set_page_config(page_title="CyberShield AI v3",page_icon="🛡️",layout="wide")
-st.title("🛡️ CyberShield AI | Centro de triagem")
+st.set_page_config(page_title=f"CyberShield AI v{VERSION}",page_icon="🛡️",layout="wide")
+st.title(f"🛡️ CyberShield AI v{VERSION} | Centro de triagem")
 st.caption("Projeto colaborativo • regras explicáveis • dados locais • revisão humana")
 st.warning("Demonstração educacional: nenhum alerta confirma um ataque. Não enviar dados pessoais ou confidenciais a hospedagens públicas.")
 st.sidebar.header("Configuração")
@@ -59,7 +60,7 @@ for a in alerts:
         for step in t['next_steps']: st.write('• '+step)
         st.info(t['privacy_check'])
         st.json(a['evidence'])
-st.download_button("⬇️ Baixar relatório JSON",json.dumps(export_report(alerts),ensure_ascii=False,indent=2),file_name="cybershield_v3_relatorio.json",mime="application/json")
+st.download_button("⬇️ Baixar relatório JSON",json.dumps(export_report(alerts),ensure_ascii=False,indent=2),file_name="cybershield_v322_relatorio.json",mime="application/json")
 st.subheader("Dados carregados (até 100 linhas)")
 if events: st.dataframe(pd.DataFrame([{**e,'timestamp':e['timestamp'].isoformat()} for e in events[:100]]),use_container_width=True)
 st.caption("Não usa API externa nem modelo generativo. A pontuação experimental desta interface não equivale às métricas da avaliação independente v2.2.")
@@ -77,6 +78,6 @@ if alerts:
     st.download_button("⬇️ Baixar relatório com IA experimental", json.dumps({
         "rules": export_report(alerts), "ai_experimental": scores,
         "disclaimer": "IA experimental sobre alertas, treinamento sintético e validação humana obrigatória"
-    }, ensure_ascii=False, indent=2), file_name="cybershield_v32_relatorio.json", mime="application/json")
+    }, ensure_ascii=False, indent=2), file_name="cybershield_v322_ia_relatorio.json", mime="application/json")
 else:
     st.info("Sem alertas das regras para pontuar nesta demonstração.")
