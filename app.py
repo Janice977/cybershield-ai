@@ -1,29 +1,40 @@
 """Dashboard educacional offline-first — dados autorizados somente."""
-import json, tempfile
+import csv, json, tempfile
 from pathlib import Path
 import pandas as pd
 import streamlit as st
 from src.engine import read_events, detect, triage, export_report
 from src.anomaly import score_alerts
+from src.upload_security import uploads_enabled, validate_upload, SAFE_UPLOAD_ERROR
 st.set_page_config(page_title="CyberShield AI v3",page_icon="🛡️",layout="wide")
 st.title("🛡️ CyberShield AI | Centro de triagem")
 st.caption("Projeto colaborativo • regras explicáveis • dados locais • revisão humana")
 st.warning("Demonstração educacional: nenhum alerta confirma um ataque. Não enviar dados pessoais ou confidenciais a hospedagens públicas.")
 st.sidebar.header("Configuração")
-mode=st.sidebar.radio("Fonte de dados",["Exemplo sintético","Enviar CSV/JSON"])
+upload_allowed = uploads_enabled()
+if upload_allowed:
+    mode = st.sidebar.radio("Fonte de dados", ["Exemplo sintético", "Enviar CSV/JSON"])
+else:
+    mode = "Exemplo sintético"
+    st.sidebar.info("Demonstração pública: envio de arquivos desativado por segurança.")
 fail=st.sidebar.slider("Falhas por janela",3,15,5)
 spray=st.sidebar.slider("Contas diferentes por origem",2,12,4)
 win=st.sidebar.slider("Janela (minutos)",1,60,10)
 if mode=="Enviar CSV/JSON":
     up=st.file_uploader("Enviar CSV ou JSON autorizado (máximo 5 MB)",type=["csv","json"])
     if not up: st.info("Selecione um arquivo para começar.");st.stop()
-    if up.size>5_000_000: st.error("Limite de 5 MB excedido");st.stop()
+    try:
+        suffix = validate_upload(up.name, up.size)
+    except ValueError as exc:
+        st.error(str(exc))
+        st.stop()
     with tempfile.TemporaryDirectory() as temp:
-        suffix=Path(up.name).suffix.lower()
         path=Path(temp)/("entrada"+suffix)
         path.write_bytes(up.getvalue())
         try: events=read_events(path)
-        except (ValueError,KeyError,UnicodeError,TypeError,json.JSONDecodeError) as exc: st.error(f"Formato de eventos inválido: {exc}");st.stop()
+        except (ValueError, KeyError, UnicodeError, TypeError, OSError, csv.Error, json.JSONDecodeError):
+            st.error(SAFE_UPLOAD_ERROR)
+            st.stop()
 else:
     events=read_events(Path(__file__).parent/'data'/'sample_events.csv')
 alerts=detect(events,window_minutes=win,fail_threshold=fail,spray_accounts=spray)
@@ -51,7 +62,7 @@ for a in alerts:
 st.download_button("⬇️ Baixar relatório JSON",json.dumps(export_report(alerts),ensure_ascii=False,indent=2),file_name="cybershield_v3_relatorio.json",mime="application/json")
 st.subheader("Dados carregados (até 100 linhas)")
 if events: st.dataframe(pd.DataFrame([{**e,'timestamp':e['timestamp'].isoformat()} for e in events[:100]]),use_container_width=True)
-st.caption("Não usa API externa nem modelo generativo. Modelo estatístico v2.2 deve ser avaliado separadamente; métricas sintéticas não são métricas deste painel.")
+st.caption("Não usa API externa nem modelo generativo. A pontuação experimental desta interface não equivale às métricas da avaliação independente v2.2.")
 
 # Pontuação experimental: separada das regras e sem ações automatizadas.
 st.subheader("IA experimental aplicada aos alertas")
