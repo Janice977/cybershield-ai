@@ -6,6 +6,7 @@ It is educational only; do not infer real-world performance from its output.
 from functools import lru_cache
 import numpy as np
 from sklearn.ensemble import IsolationForest
+from src.processing_trace import record_step
 
 FEATURE_NAMES = ('evidence_count', 'severity_high', 'rule_auth', 'rule_ot', 'rule_malware')
 
@@ -34,15 +35,16 @@ def demo_model():
     return IsolationForest(n_estimators=100, contamination=.1, random_state=42).fit(x)
 
 
-def score_alerts(alerts):
+def score_alerts(alerts, trace=None):
     """Return metadata aligned to alerts. Negative decision means demo anomaly."""
     if not alerts:
+        record_step(trace, "IA experimental", "Nenhum alerta para pontuar; modelo não executado.")
         return []
     matrix = np.vstack([alert_features(a) for a in alerts])
     model = demo_model()
     decision = model.decision_function(matrix)
     predicted = model.predict(matrix)
-    return [{
+    scores = [{
         'rule_id': a.get('rule_id'),
         'entity': a.get('entity'),
         'anomaly_score': round(float(s), 5),
@@ -50,3 +52,7 @@ def score_alerts(alerts):
         'features': dict(zip(FEATURE_NAMES, [float(v) for v in row])),
         'disclaimer': 'Score experimental, treinado com dados sintéticos; não é probabilidade nem confirmação de ataque.'
     } for a, row, s, p in zip(alerts, matrix, decision, predicted)]
+    record_step(trace, "IA experimental",
+                f"{len(scores)} alerta(s) pontuado(s); "
+                f"{sum(x['demo_anomaly'] for x in scores)} sinalizado(s) como anomalia na demonstração.")
+    return scores
