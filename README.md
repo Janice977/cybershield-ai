@@ -1,5 +1,5 @@
 
-# 🛡️ CyberShield AI v3.2.2 — Community
+# 🛡️ CyberShield AI v3.3.0 — Community
 
 **Open Source Cybersecurity & AI-Powered Defensive Monitoring**
 
@@ -19,11 +19,12 @@ https://cybershield-ai-community.streamlit.app/
 - Pontuação experimental de anomalias com Isolation Forest.
 - Painel interativo desenvolvido em Streamlit.
 - Geração de relatórios JSON.
+- Histórico real e reproduzível das etapas de processamento: leitura, validação, avaliação das regras, pontuação de IA experimental, triagem e relatório.
 - Orientações defensivas para investigação SOC N1.
 
 ## 🤖 Inteligência Artificial
 
-A versão 3.2.2 integra um modelo experimental de aprendizado de máquina aos alertas produzidos pelo motor de regras.
+A versão 3.3.0 mantém a integração de um modelo experimental de aprendizado de máquina aos alertas produzidos pelo motor de regras.
 
 O modelo utiliza dados sintéticos e suas pontuações não representam probabilidades de ataque.
 
@@ -61,3 +62,11 @@ Utilize exclusivamente dados fictícios ou devidamente autorizados. Não envie d
 A demonstração pública desabilita uploads por padrão. Para habilitar em **instalação privada controlada**, o operador precisa definir **todas** as variáveis: `CYBERSHIELD_DEPLOYMENT_MODE=private`, `CYBERSHIELD_ENABLE_UPLOADS=1` e `CYBERSHIELD_PUBLIC_DEMO=0`. Não habilite uploads no Streamlit Community Cloud. Essa configuração não substitui autenticação, isolamento, proteção de dados ou avaliação de segurança.
 
 A automação `.github/workflows/dependency-audit.yml` executa `pip-audit` semanalmente, sob demanda e em alterações de dependências. Alertas devem ser triados; intervalos de versões não garantem reprodução bit a bit.
+
+## 📋 Histórico de processamento (v3.3.0)
+
+A aplicação Streamlit registra as **etapas realmente executadas** para os dados e parâmetros escolhidos, com contagens de registros, eventos válidos, alertas por regra e pontuações experimentais. O resultado aparece na seção **Histórico real de processamento** e pode ser exportado para JSON.
+
+**Não se trata de uma API externa, monitoramento ao vivo ou integração com SIEM.** O histórico não registra horários fabricados, dados pessoais, endereços IP, nomes de contas nem conteúdo bruto dos eventos. Um novo ajuste nos controles do Streamlit provoca uma nova execução e atualiza os resultados.
+
+O painel usa dados sintéticos por padrão; uploads seguem proibidos na demonstração pública. As orientações de triagem exigem revisão humana.

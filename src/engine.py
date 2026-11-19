@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import csv, json, ipaddress
 from pathlib import Path
 from src.version import VERSION
+from src.processing_trace import record_step
 
 RULES = {
  "CSAI-001": ("Possível força bruta", "T1110", "Validar tentativas com a equipe, revisar autenticação e MFA."),
@@ -12,7 +13,7 @@ RULES = {
  "CSAI-004": ("Evento de malware informado", "T1204", "Isolar somente com autorização, preservar evidências e abrir investigação."),
 }
 
-def read_events(path):
+def read_events(path, trace=None):
     path=Path(path)
     if path.stat().st_size>5_000_000: raise ValueError("Arquivo maior que 5 MB")
     if path.suffix.lower()=='.csv':
@@ -21,7 +22,10 @@ def read_events(path):
         rows=json.loads(path.read_text(encoding='utf-8'))
     else: raise ValueError("Formato suportado: CSV ou JSON")
     if not isinstance(rows,list) or len(rows)>20000: raise ValueError("Esperada lista de até 20.000 eventos")
-    return normalize(rows)
+    record_step(trace, "Leitura", f"{len(rows)} registro(s) lido(s) do formato {path.suffix.lower()[1:].upper()}.")
+    events = normalize(rows)
+    record_step(trace, "Validação", f"{len(events)} evento(s) válido(s); {len(rows)-len(events)} descartado(s).")
+    return events
 
 def normalize(rows):
     out=[]
@@ -46,8 +50,11 @@ def alert(rule_id, anchor, evidence, severity, entity):
       "evidence":evidence[:10],"mitre_attack":technique,"recommendation":advice,
       "confidence":"heurística: requer validação humana"}
 
-def detect(events,window_minutes=10,fail_threshold=5,spray_accounts=4):
+def detect(events,window_minutes=10,fail_threshold=5,spray_accounts=4,trace=None):
     events=normalize(events) if events and isinstance(events[0].get('timestamp'),str) else events
+    record_step(trace, "Detecção",
+                f"{len(events)} evento(s) analisado(s); janela de {window_minutes} min; "
+                f"limiar de {fail_threshold} falha(s) e {spray_accounts} conta(s) por origem.")
     result=[]; logins=defaultdict(list)
     for e in events:
         if e['event_type']=='login_failed' and e['src_ip']:logins[e['src_ip']].append(e)
@@ -69,6 +76,12 @@ def detect(events,window_minutes=10,fail_threshold=5,spray_accounts=4):
             result.append(alert('CSAI-003',e['timestamp'],[{"asset":e['asset'],"value":e['value']}],'high',e['asset'] or 'OT'))
         if e['event_type']=='malware_detected':
             result.append(alert('CSAI-004',e['timestamp'],[{"asset":e['asset']}],'high',e['asset'] or 'endpoint'))
+    for rule_id in RULES:
+        count = sum(a["rule_id"] == rule_id for a in result)
+        record_step(trace, f"Regra {rule_id}", f"Regra avaliada; {count} alerta(s) gerado(s).")
+    record_step(trace, "Resultado",
+                f"{len(result)} alerta(s) no total; "
+                f"{sum(a['severity'] == 'high' for a in result)} de severidade alta.")
     return sorted(result,key=lambda x:(x['severity']!='high',x['timestamp']))
 
 def triage(a):

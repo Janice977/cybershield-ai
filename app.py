@@ -6,6 +6,7 @@ import streamlit as st
 from src.engine import read_events, detect, triage, export_report
 from src.anomaly import score_alerts
 from src.version import VERSION
+from src.processing_trace import record_step
 from src.upload_security import uploads_enabled, validate_upload, SAFE_UPLOAD_ERROR
 st.set_page_config(page_title=f"CyberShield AI v{VERSION}",page_icon="🛡️",layout="wide")
 st.title(f"🛡️ CyberShield AI v{VERSION} | Centro de triagem")
@@ -21,6 +22,7 @@ else:
 fail=st.sidebar.slider("Falhas por janela",3,15,5)
 spray=st.sidebar.slider("Contas diferentes por origem",2,12,4)
 win=st.sidebar.slider("Janela (minutos)",1,60,10)
+processing_trace=[]
 if mode=="Enviar CSV/JSON":
     up=st.file_uploader("Enviar CSV ou JSON autorizado (máximo 5 MB)",type=["csv","json"])
     if not up: st.info("Selecione um arquivo para começar.");st.stop()
@@ -32,15 +34,34 @@ if mode=="Enviar CSV/JSON":
     with tempfile.TemporaryDirectory() as temp:
         path=Path(temp)/("entrada"+suffix)
         path.write_bytes(up.getvalue())
-        try: events=read_events(path)
+        try: events=read_events(path, trace=processing_trace)
         except (ValueError, KeyError, UnicodeError, TypeError, OSError, csv.Error, json.JSONDecodeError):
             st.error(SAFE_UPLOAD_ERROR)
             st.stop()
 else:
-    events=read_events(Path(__file__).parent/'data'/'sample_events.csv')
-alerts=detect(events,window_minutes=win,fail_threshold=fail,spray_accounts=spray)
+    events=read_events(Path(__file__).parent/'data'/'sample_events.csv', trace=processing_trace)
+alerts=detect(events,window_minutes=win,fail_threshold=fail,spray_accounts=spray,trace=processing_trace)
+scores=score_alerts(alerts, trace=processing_trace)
+triage_results=[triage(a) for a in alerts]
+record_step(processing_trace, "Triagem", f"{len(triage_results)} orientações de revisão humana produzidas.")
+rule_report=export_report(alerts)
+record_step(processing_trace, "Relatório", "Relatório JSON de regras gerado para esta execução.")
 low,med,high=st.columns(3)
 low.metric("Eventos válidos",len(events));med.metric("Alertas",len(alerts));high.metric("Severidade alta",sum(a['severity']=='high' for a in alerts))
+st.subheader("Histórico real de processamento")
+st.caption("Etapas registradas nesta execução local do aplicativo, após ajustar os parâmetros. "
+           "Não é uma API externa, não transmite logs e não representa monitoramento em tempo real. "
+           "O histórico mostra apenas contagens agregadas, sem IPs, contas ou conteúdo dos eventos.")
+st.dataframe(pd.DataFrame(processing_trace), hide_index=True, use_container_width=True)
+st.download_button(
+    "⬇️ Baixar histórico de processamento (JSON)",
+    json.dumps({"version": VERSION, "type": "internal_processing_trace",
+                "origin": "synthetic_demo" if mode == "Exemplo sintético" else "authorized_local_input",
+                "realtime": False, "external_api": False, "steps": processing_trace},
+               ensure_ascii=False, indent=2),
+    file_name=f"cybershield_v{VERSION.replace('.', '')}_historico.json",
+    mime="application/json",
+)
 left,right=st.columns([2,1])
 with left:
     st.subheader("Eventos por tipo")
@@ -52,15 +73,14 @@ with right:
     else: st.info("Nenhum alerta detectado")
 st.subheader("Investigação orientada")
 if not alerts: st.success("Nenhuma regra disparou. Isso não garante ausência de ameaças.")
-for a in alerts:
+for a,t in zip(alerts,triage_results):
     with st.expander(f"{a['severity'].upper()} · {a['rule_id']} · {a['title']} · {a['entity']}"):
-        t=triage(a)
         st.write(t['summary']);st.write(t['assessment'])
         st.caption(f"MITRE ATT&CK (hipótese): {a['mitre_attack']} — {t['status']}")
         for step in t['next_steps']: st.write('• '+step)
         st.info(t['privacy_check'])
         st.json(a['evidence'])
-st.download_button("⬇️ Baixar relatório JSON",json.dumps(export_report(alerts),ensure_ascii=False,indent=2),file_name="cybershield_v322_relatorio.json",mime="application/json")
+st.download_button("⬇️ Baixar relatório JSON",json.dumps(rule_report,ensure_ascii=False,indent=2),file_name=f"cybershield_v{VERSION.replace('.', '')}_relatorio.json",mime="application/json")
 st.subheader("Dados carregados (até 100 linhas)")
 if events: st.dataframe(pd.DataFrame([{**e,'timestamp':e['timestamp'].isoformat()} for e in events[:100]]),use_container_width=True)
 st.caption("Não usa API externa nem modelo generativo. A pontuação experimental desta interface não equivale às métricas da avaliação independente v2.2.")
@@ -69,15 +89,14 @@ st.caption("Não usa API externa nem modelo generativo. A pontuação experiment
 st.subheader("IA experimental aplicada aos alertas")
 st.caption("Modelo treinado em dados sintéticos de demonstração. A pontuação não representa probabilidade de ataque, nem reproduz a avaliação independente v2.2.")
 if alerts:
-    scores = score_alerts(alerts)
     st.dataframe(pd.DataFrame([{
         "Regra": x["rule_id"], "Entidade": x["entity"],
         "Pontuação de anomalia": x["anomaly_score"],
         "Anomalia (demo)": x["demo_anomaly"],
     } for x in scores]), use_container_width=True)
     st.download_button("⬇️ Baixar relatório com IA experimental", json.dumps({
-        "rules": export_report(alerts), "ai_experimental": scores,
+        "rules": rule_report, "ai_experimental": scores,
         "disclaimer": "IA experimental sobre alertas, treinamento sintético e validação humana obrigatória"
-    }, ensure_ascii=False, indent=2), file_name="cybershield_v322_ia_relatorio.json", mime="application/json")
+    }, ensure_ascii=False, indent=2), file_name=f"cybershield_v{VERSION.replace('.', '')}_ia_relatorio.json", mime="application/json")
 else:
     st.info("Sem alertas das regras para pontuar nesta demonstração.")
